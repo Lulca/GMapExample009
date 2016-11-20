@@ -2,9 +2,9 @@
 	document.addEventListener("deviceready", onDeviceReady, false);
 	function onDeviceReady() {
 
-		navigator.geolocation.getCurrentPosition(onSuccess, onError, { timeout: 30000 });
+		var initialMarker, endMarker, map, lat, lng, latitude1, longitude1, latitude2, longitude2, distanceBetween = 200;
 
-		var initialMarker, map, lat, lng;
+		navigator.geolocation.getCurrentPosition(onSuccess, onError, { timeout: 30000 });
 
 		function onSuccess(position) {
 			lat = position.coords.latitude;
@@ -19,16 +19,18 @@
 			    //add marker by clicking on the map
 			    google.maps.event.addListener(map, "dblclick", function(event) {
 			    	var lat = event.latLng.lat(),
-			    	lng = event.latLng.lng();
-			    	var marker = new google.maps.Marker({
+			    		lng = event.latLng.lng();
+			    		endMarker = new google.maps.Marker({
 			    		position: {lat: lat, lng: lng},
 			    		map: map,
 			    		draggable:true,
 			    		title:"Drag me!"
 			    	});
 
-			    	marker.addListener("click", function() {
-			    		marker.setMap(null);
+			    	checkDistanceBetween(lat, lng, initialMarker.position.lat(), initialMarker.position.lng());
+
+			    	endMarker.addListener("click", function() {
+			    		endMarker.setMap(null);
 			    	});
 			    });
 			}
@@ -37,12 +39,33 @@
 				alert('code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
 			}
 
-			google.maps.event.addDomListener(window, 'load', onSuccess);
+			function computeDistance(lat1, lng1, lat2, lng2) {
+				return google.maps.geometry.spherical.computeDistanceBetween(
+					new google.maps.LatLng(lat1, lng1), new google.maps.LatLng(lat2, lng2)
+					);
+			}
+
+			function checkDistanceBetween(lat1, lng1, lat2, lng2) {
+				if (computeDistance(lat1, lng1, lat2, lng2) < distanceBetween) {
+					alert("You've got here!");
+				} 
+			}
+
+			var options = {
+				enableHighAccuracy: true,
+				timeout: 5000,
+				maximumAge: 0
+			};
 
 			navigator.geolocation.watchPosition(
 				function (position) {
 					setMarkerPosition(initialMarker, position);
-				});
+					if (endMarker) {
+						checkDistanceBetween(position.coords.latitude, position.coords.longitude, endMarker.position.lat(), endMarker.position.lng());
+					}
+				}, function(error) {
+					alert(error);
+				}, options);
 
 			function setMarkerPosition(marker, position) {
 				marker.setPosition(
@@ -51,22 +74,5 @@
 						position.coords.longitude)
 					);
 			}
-
-			// var watchID = navigator.geolocation.watchPosition(function(position) {
-
-			// 	var element = document.getElementById('geolocation');
-			// 	element.innerHTML = 'Latitude: '  + position.coords.latitude      + '<br />' +
-			// 	'Longitude: ' + position.coords.longitude     + '<br />' +
-			// 	'<hr />'      + element.innerHTML;
-
-			// }, function(error) {
-			// 	alert('code: '    + error.code    + '\n' +
-			// 		'message: ' + error.message + '\n');
-			// }, { timeout: 1000 });
-
-
-
-
-
 		}
 	})();
