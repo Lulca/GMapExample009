@@ -2,7 +2,7 @@
 	document.addEventListener("deviceready", onDeviceReady, false);
 	function onDeviceReady() {
 
-		var initialMarker, endMarker, map, lat, lng, latitude1, longitude1, latitude2, longitude2, distanceBetween = 200;
+		var initialMarker, endMarker, map, lat, lng, latitude1, longitude1, latitude2, longitude2, distanceBetween = 50, flag = 0;
 
 		navigator.geolocation.getCurrentPosition(onSuccess, onError, { timeout: 30000 });
 
@@ -18,6 +18,7 @@
 
 			    //add marker by clicking on the map
 			    google.maps.event.addListener(map, "dblclick", function(event) {
+			    		flag = 0;
 			    	var lat = event.latLng.lat(),
 			    		lng = event.latLng.lng();
 			    		endMarker = new google.maps.Marker({
@@ -46,8 +47,9 @@
 			}
 
 			function checkDistanceBetween(lat1, lng1, lat2, lng2) {
-				if (computeDistance(lat1, lng1, lat2, lng2) < distanceBetween) {
+				if (computeDistance(lat1, lng1, lat2, lng2) < distanceBetween && flag === 0) {
 					alert("You've got here!");
+					flag = 1;
 				} 
 			}
 
@@ -59,6 +61,8 @@
 
 			navigator.geolocation.watchPosition(
 				function (position) {
+					var center = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+    				map.panTo(center);
 					setMarkerPosition(initialMarker, position);
 					if (endMarker) {
 						checkDistanceBetween(position.coords.latitude, position.coords.longitude, endMarker.position.lat(), endMarker.position.lng());
