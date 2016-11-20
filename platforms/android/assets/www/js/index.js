@@ -31,7 +31,7 @@
 			    	checkDistanceBetween(lat, lng, initialMarker.position.lat(), initialMarker.position.lng());
 
 			    	endMarker.addListener("click", function() {
-			    		endMarker.setMap(null);
+			    		this.setMap(null);
 			    	});
 			    });
 			}
@@ -48,7 +48,9 @@
 
 			function checkDistanceBetween(lat1, lng1, lat2, lng2) {
 				if (computeDistance(lat1, lng1, lat2, lng2) < distanceBetween && flag === 0) {
-					alert("You've got here!");
+					document.getElementById("message").style.display = "block";	
+					navigator.notification.beep(1);
+					navigator.vibrate([1000, 500, 1000, 500, 1000]);
 					flag = 1;
 				} 
 			}
@@ -78,5 +80,13 @@
 						position.coords.longitude)
 					);
 			}
+
+			//hide notification block by clicking
+
+			var message = document.getElementById("message");
+
+			message.addEventListener('click', function() {
+				this.style.display = 'none';
+			});
 		}
 	})();

@@ -12,3 +12,15 @@ body {
 #map-canvas { 
     height: 100%;
 }
+
+#message {
+	display: inline-block;
+	position: absolute;
+	background-color: #fff;
+	padding: 20px;
+	top: 30%;
+	left: 50%;
+	margin-left: -110px;
+	display: none;
+	border: 1px solid #000;
+}
